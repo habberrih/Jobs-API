@@ -12,7 +12,14 @@ const { BadRequestError } = require('../errors');
 
 async function httpRegisterUser(req, res) {
   const newUser = req.body;
-  const { error, value } = CreateUserSchema.validate(newUser);
+
+  const ValidationOptions = {
+    abortErly: false,
+  };
+  const { error, value } = CreateUserSchema.validate(
+    newUser,
+    ValidationOptions
+  );
 
   if (error) {
     throw new BadRequestError(error.details[0].message);
