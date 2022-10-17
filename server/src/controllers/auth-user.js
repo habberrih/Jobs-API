@@ -7,17 +7,18 @@ const {
 // Joi Validation
 const { CreateUserSchema } = require('./joi-schema/userSchema');
 
+// errors Module
+const { BadRequestError } = require('../errors');
+
 async function httpRegisterUser(req, res) {
   const newUser = req.body;
   const { error, value } = CreateUserSchema.validate(newUser);
 
-  try {
-    const result = await registerUser(value);
-    return res.status(200).json(result);
-  } catch (err) {
-    console.log(error);
-    return res.status(500).json(error.details[0].message);
+  if (error) {
+    throw new BadRequestError(error.details[0].message);
   }
+  const result = await registerUser(value);
+  return res.status(200).json(result);
 }
 
 async function httpLoginUser(req, res) {
