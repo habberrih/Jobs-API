@@ -5,7 +5,7 @@ const {
 } = require('../models/auth-user');
 
 // Joi Validation
-const { CreateUserSchema } = require('./joi-schema/userSchema');
+const { ValidateCreateUser } = require('./validator');
 
 // errors Module
 const { BadRequestError } = require('../errors');
@@ -13,13 +13,7 @@ const { BadRequestError } = require('../errors');
 async function httpRegisterUser(req, res) {
   const newUser = req.body;
 
-  const ValidationOptions = {
-    abortErly: false,
-  };
-  const { error, value } = CreateUserSchema.validate(
-    newUser,
-    ValidationOptions
-  );
+  const { error, value } = ValidateCreateUser(newUser);
 
   if (error) {
     throw new BadRequestError(error.details[0].message);
