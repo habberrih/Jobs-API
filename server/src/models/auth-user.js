@@ -17,16 +17,6 @@ prisma.$use(async (params, next) => {
   return result;
 });
 
-async function registerUser(validatedUser) {
-  try {
-    return await prisma.users.create({
-      data: validatedUser,
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 async function getAllUsers() {
   return await prisma.users.findMany({});
 }
@@ -38,9 +28,28 @@ async function getUserById(userId) {
     },
   });
 }
+async function registerUser(validatedUser) {
+  try {
+    return await prisma.users.create({
+      data: validatedUser,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 async function loginUsers(user) {
   return 'user logined in';
+}
+
+async function deleteAllUsers() {
+  const users = await prisma.users.findMany({});
+
+  return prisma.users.deleteMany({
+    where: {
+      id: users.id,
+    },
+  });
 }
 
 module.exports = {
@@ -48,4 +57,5 @@ module.exports = {
   loginUsers,
   getAllUsers,
   getUserById,
+  deleteAllUsers,
 };

@@ -9,6 +9,7 @@ const {
   loginUsers,
   getUserById,
   getAllUsers,
+  deleteAllUsers,
 } = require('../models/auth-user');
 
 async function httpRegisterUser(req, res) {
@@ -41,8 +42,19 @@ async function httpGetAllUsers(req, res) {
   }
 }
 
+async function httpDeleteAllUsers(req, res) {
+  try {
+    await deleteAllUsers();
+    return res.status(StatusCodes.OK).json('ok everything deleted');
+  } catch (error) {
+    console.log(error);
+    throw new BadRequestError('Something went wrong!!');
+  }
+}
+
 module.exports = {
   httpRegisterUser,
   httpLoginUser,
   httpGetAllUsers,
+  httpDeleteAllUsers,
 };
