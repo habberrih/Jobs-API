@@ -30,6 +30,14 @@ async function getAllUsers() {
   return await prisma.users.findMany({});
 }
 
+async function getUserById(userId) {
+  return await prisma.users.findMany({
+    where: {
+      id: userId,
+    },
+  });
+}
+
 async function loginUsers(user) {
   return 'user logined in';
 }
@@ -38,4 +46,5 @@ module.exports = {
   registerUser,
   loginUsers,
   getAllUsers,
+  getUserById,
 };

@@ -1,28 +1,46 @@
+require('dotenv').config();
+//JWT module
+const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
+
+// Models module
 const {
   registerUser,
   loginUsers,
+  getUserById,
   getAllUsers,
 } = require('../models/auth-user');
 
 // Joi Validation
 const { ValidateCreateUser } = require('./validator');
-
 // errors Module
 const { BadRequestError } = require('../errors');
 
 async function httpRegisterUser(req, res) {
   const newUser = req.body;
 
-  // Validation the request
+  // Validate the request
   const { error, value } = ValidateCreateUser(newUser);
+  if (error) throw new BadRequestError(error.details[0].message);
 
-  if (error) {
-    throw new BadRequestError(error.details[0].message);
-  }
+  const createdUser = await registerUser(value); // store in db
 
-  const createdUser = await registerUser(value);
-  return res.status(StatusCodes.CREATED).json(createdUser);
+  const TokenData = {
+    infoUser: { id: createdUser.id, username: createdUser.name },
+    JWTSecret: process.env.JWT_SECRET,
+    JWT_expired: {
+      expiresIn: '30d',
+    },
+  };
+
+  //Generate the token
+  const token = jwt.sign(
+    TokenData.infoUser,
+    TokenData.JWTSecret,
+    TokenData.JWT_expired
+  );
+
+  return res.status(StatusCodes.CREATED).json({ createdUser, token });
 }
 
 async function httpLoginUser(req, res) {
