@@ -2,12 +2,14 @@ const { StatusCodes } = require('http-status-codes');
 
 // Joi Validation, Error Handling
 const { ValidateCreateUser } = require('./validator');
-const { BadRequestError } = require('../errors');
+const { BadRequestError, UnauthenticatedError } = require('../errors');
 const { generateToken } = require('../utils/jwt');
+const { comparePassword } = require('../utils/cmp-login-password');
 const {
   registerUser,
   loginUsers,
   getUserById,
+  getUserByEmail,
   getAllUsers,
   deleteAllUsers,
 } = require('../models/auth-user');
@@ -24,13 +26,26 @@ async function httpRegisterUser(req, res) {
   const token = await generateToken(createdUser);
 
   return res.status(StatusCodes.CREATED).json({
-    user: { name: createdUser.name, email: createdUser.email },
+    user: { name: createdUser.name },
     token,
   });
 }
 
 async function httpLoginUser(req, res) {
-  return res.send('Login user');
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadRequestError('Please enter an email and password');
+  }
+
+  // check if the user is in the database
+  const user = await getUserByEmail(email);
+  if (!user) throw new UnauthenticatedError('Invalid email or password');
+
+  const isPasswordCorrect = await comparePassword(password, user.password);
+  if (!isPasswordCorrect) throw new UnauthenticatedError('Incorrect password');
+
+  const token = await generateToken(user);
+  return res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
 }
 
 async function httpGetAllUsers(req, res) {

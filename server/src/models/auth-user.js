@@ -28,6 +28,19 @@ async function getUserById(userId) {
     },
   });
 }
+
+async function getUserByEmail(userEmail) {
+  try {
+    return await prisma.users.findUnique({
+      where: {
+        email: userEmail,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function registerUser(validatedUser) {
   try {
     return await prisma.users.create({
@@ -53,9 +66,10 @@ async function deleteAllUsers() {
 }
 
 module.exports = {
-  registerUser,
-  loginUsers,
   getAllUsers,
   getUserById,
+  getUserByEmail,
+  registerUser,
+  loginUsers,
   deleteAllUsers,
 };
