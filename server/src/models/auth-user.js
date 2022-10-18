@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
+// Prisma Middleware
 prisma.$use(async (params, next) => {
   const validatedUserData = params.args.data;
   if (params.model == 'Users' && params.action == 'create') {
