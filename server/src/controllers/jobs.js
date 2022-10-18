@@ -7,7 +7,7 @@ async function httpGetJobById(req, res) {
 }
 
 async function httpCreateJob(req, res) {
-  return res.send('create job');
+  return res.json(req.user);
 }
 
 async function httpUpdateJob(req, res) {
