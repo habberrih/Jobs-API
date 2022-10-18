@@ -10,7 +10,7 @@ const validator = (schema) => (payload) =>
 const CreateUserSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(3).max(6).required(),
+  password: Joi.string().min(3).required(),
 });
 
 exports.ValidateCreateUser = validator(CreateUserSchema);

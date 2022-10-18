@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const { StatusCodes } = require('http-status-codes');
 const {
   registerUser,
   loginUsers,
@@ -18,8 +20,19 @@ async function httpRegisterUser(req, res) {
   if (error) {
     throw new BadRequestError(error.details[0].message);
   }
-  const result = await registerUser(value);
-  return res.status(200).json(result);
+
+  // Generate a Hash Password and store it in the database
+  const salt = await bcrypt.genSalt(10); // length of hash string
+  const hashedPassword = await bcrypt.hash(value.password, salt);
+
+  // create temp user for the hashed password
+  const tempUser = {
+    name: value.name,
+    email: value.email,
+    password: hashedPassword,
+  };
+  const createdUser = await registerUser(tempUser);
+  return res.status(StatusCodes.CREATED).json(createdUser);
 }
 
 async function httpLoginUser(req, res) {
@@ -29,9 +42,9 @@ async function httpLoginUser(req, res) {
 async function httpGetAllUsers(req, res) {
   try {
     const users = await getAllUsers();
-    return res.status(200).json(users);
+    return res.status(StatusCodes.OK).json(users);
   } catch (error) {
-    return res.status(500).json({ msg: 'You fucked up' });
+    throw new BadRequestError('Something went wrong!!');
   }
 }
 
