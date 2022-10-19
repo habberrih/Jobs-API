@@ -1,3 +1,5 @@
+const { ValidateCreateJob } = require('./validator');
+
 async function httpGetAllJobs(req, res) {
   return res.send('get all jobs');
 }

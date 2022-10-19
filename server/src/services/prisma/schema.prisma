@@ -16,4 +16,22 @@ model Users {
   name String
   email String @unique
   password String 
+  job Jobs[]
+}
+
+model Jobs {
+  id Int @id @default(autoincrement())
+  company String 
+  postions String
+  status Status @default(pending)
+  createdBy Users @relation(fields: [user_id], references: [id])
+  user_id Int 
+  
+  
+}
+
+enum Status{
+  interview
+  declined
+  pending
 }
