@@ -9,11 +9,28 @@ async function getAllJobs(user) {
         id: user.id,
       },
     },
+    orderBy: [
+      {
+        createdAt: 'asc',
+      },
+    ],
   });
 }
 
-async function getJobById(jobId) {
-  return;
+async function getJobById(jobId, userId) {
+  try {
+    return prisma.jobs.findMany({
+      where: {
+        id: jobId,
+        createdBy: {
+          // users table
+          id: userId,
+        },
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function createJob(validatedJob) {

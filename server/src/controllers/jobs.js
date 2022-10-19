@@ -1,8 +1,18 @@
 const { ValidateCreateJob } = require('./validator');
 const { StatusCodes } = require('http-status-codes');
-const { BadRequestError, NotFoundError } = require('../errors/');
+const {
+  BadRequestError,
+  NotFoundError,
+  UnauthenticatedError,
+  ForbiddenError,
+} = require('../errors/');
 
-const { getAllJobs, createJob, deleteJob } = require('../models/job');
+const {
+  getAllJobs,
+  createJob,
+  deleteJob,
+  getJobById,
+} = require('../models/job');
 
 async function httpGetAllJobs(req, res) {
   try {
@@ -15,7 +25,15 @@ async function httpGetAllJobs(req, res) {
 }
 
 async function httpGetJobById(req, res) {
-  return res.send('get one job');
+  const {
+    user: { id: userId },
+    params: { id: jobId },
+  } = req;
+  const singleJob = await getJobById(Number(jobId), userId);
+
+  if (singleJob == []) throw new ForbiddenError('this is not your own job');
+
+  return res.status(StatusCodes.OK).json(singleJob);
 }
 
 async function httpCreateJob(req, res) {
