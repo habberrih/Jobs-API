@@ -39,8 +39,34 @@ async function createJob(validatedJob) {
   });
 }
 
-async function updateJob() {
-  return;
+async function updateJobThrowUser(userId, jobId, job) {
+  // updated job from user table
+  await prisma.users.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      //Jobs table
+      job: {
+        update: {
+          where: {
+            id: jobId,
+          },
+          data: job,
+        },
+      },
+    },
+  });
+}
+
+async function updateJob(jobId, job, userId) {
+  await updateJobThrowUser(userId, jobId, job);
+  // get the updated job
+  return await prisma.jobs.findUnique({
+    where: {
+      id: jobId,
+    },
+  });
 }
 
 async function deleteJob(jobId) {

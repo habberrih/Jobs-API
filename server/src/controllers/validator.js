@@ -19,6 +19,11 @@ const CreateJobSchema = Joi.object({
   stauts: Joi.optional(),
   user_id: Joi.number().required(),
 });
+const UpdateJobSchema = Joi.object({
+  company: Joi.string().required(),
+  positions: Joi.string().required(),
+});
 
 exports.ValidateCreateUser = validator(CreateUserSchema);
 exports.ValidateCreateJob = validator(CreateJobSchema);
+exports.ValidateUpdateJob = validator(UpdateJobSchema);
