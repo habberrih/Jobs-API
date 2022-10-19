@@ -18,7 +18,13 @@ prisma.$use(async (params, next) => {
 });
 
 async function getAllUsers() {
-  return await prisma.users.findMany({});
+  const usersWithPass = await prisma.users.findMany({});
+  let usersWithoutPass = {};
+  for (let index = 0; index < usersWithPass.length; index++) {
+    delete usersWithPass[index].password;
+    usersWithoutPass = { ...usersWithoutPass, usersWithPass };
+  }
+  return usersWithoutPass;
 }
 
 async function getUserById(userId) {

@@ -1,21 +1,37 @@
-async function getAllJobs() {
-  return;
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
+async function getAllJobs(user) {
+  return prisma.jobs.findMany({
+    where: {
+      createdBy: {
+        id: user.id,
+      },
+    },
+  });
 }
 
 async function getJobById(jobId) {
   return;
 }
 
-async function createJob() {
-  return;
+async function createJob(validatedJob) {
+  return prisma.jobs.create({
+    data: validatedJob,
+  });
 }
 
 async function updateJob() {
   return;
 }
 
-async function deleteJob(req, res) {
-  return;
+async function deleteJob(jobId) {
+  return prisma.jobs.delete({
+    where: {
+      id: jobId,
+    },
+  });
 }
 
 module.exports = {
