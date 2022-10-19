@@ -15,7 +15,7 @@ const CreateUserSchema = Joi.object({
 
 const CreateJobSchema = Joi.object({
   company: Joi.string().required(),
-  postions: Joi.string().required(),
+  positions: Joi.string().required(),
   stauts: Joi.optional(),
   user_id: Joi.number().required(),
 });

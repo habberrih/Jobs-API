@@ -19,6 +19,7 @@ async function httpRegisterUser(req, res) {
 
   // Validate the request
   const { error, value } = ValidateCreateUser(newUser);
+
   if (error) throw new BadRequestError(error.details[0].message);
 
   // store user in db after validation the request, then generate token

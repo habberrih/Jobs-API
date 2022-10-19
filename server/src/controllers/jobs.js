@@ -10,7 +10,6 @@ async function httpGetAllJobs(req, res) {
     const jobs = await getAllJobs(user);
     return res.status(StatusCodes.OK).json({ jobs });
   } catch (error) {
-    console.log(error);
     throw new BadRequestError('Something went wrong!!');
   }
 }
