@@ -69,10 +69,17 @@ async function updateJob(jobId, job, userId) {
   });
 }
 
-async function deleteJob(jobId) {
-  return prisma.jobs.delete({
+// TODO: Fix the bugs in deleteJob function
+
+async function deleteJob(jobId, userId) {
+  return await prisma.users.update({
     where: {
-      id: jobId,
+      id: userId,
+    },
+    data: {
+      job: {
+        disconnect: [{ id: jobId }, { id: userId }],
+      },
     },
   });
 }

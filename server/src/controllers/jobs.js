@@ -33,6 +33,7 @@ async function httpGetJobById(req, res) {
 
   const singleJob = await getJobById(Number(jobId), userId);
 
+  // ToDo: prevent other users from accessing this job
   if (singleJob == []) throw new ForbiddenError('this is not your own job');
 
   return res.status(StatusCodes.OK).json(singleJob);
@@ -67,9 +68,17 @@ async function httpUpdateJob(req, res) {
 }
 
 async function httpDeleteJob(req, res) {
-  const jobId = Number(req.params.id);
-  const deletedJob = await deleteJob(jobId);
-  return res.send('Delete job');
+  const {
+    params: { id: jobId },
+    user: { id },
+  } = req;
+  try {
+    await deleteJob(Number(jobId), id);
+    return res.status(StatusCodes.OK).json('Successfully deleted job');
+  } catch (error) {
+    console.log(error);
+    throw new ForbiddenError('Can not delete job with id: ' + jobId);
+  }
 }
 
 module.exports = {
