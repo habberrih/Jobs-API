@@ -1,4 +1,4 @@
-const { ValidateCreateJob } = require('./validator');
+const { ValidateCreateJob, ValidateUpdateJob } = require('./validator');
 const { StatusCodes } = require('http-status-codes');
 const {
   BadRequestError,
@@ -12,6 +12,7 @@ const {
   createJob,
   deleteJob,
   getJobById,
+  updateJob,
 } = require('../models/job');
 
 async function httpGetAllJobs(req, res) {
@@ -29,8 +30,10 @@ async function httpGetJobById(req, res) {
     user: { id: userId },
     params: { id: jobId },
   } = req;
+
   const singleJob = await getJobById(Number(jobId), userId);
 
+  // ToDo: prevent other users from accessing this job
   if (singleJob == []) throw new ForbiddenError('this is not your own job');
 
   return res.status(StatusCodes.OK).json(singleJob);
@@ -48,13 +51,34 @@ async function httpCreateJob(req, res) {
 }
 
 async function httpUpdateJob(req, res) {
-  return res.send('Update job');
+  const {
+    body: { company, positions },
+    params: { id: jobId },
+    user: { id },
+  } = req;
+  const { error, value } = ValidateUpdateJob(req.body);
+  if (error) return res.status(StatusCodes.BAD_REQUEST).json(error.details);
+  try {
+    const updatedJob = await updateJob(Number(jobId), value, id);
+    return res.status(StatusCodes.OK).json({ updatedJob });
+  } catch (error) {
+    console.log(error);
+    throw new ForbiddenError('Can not update, this is not your own job');
+  }
 }
 
 async function httpDeleteJob(req, res) {
-  const jobId = Number(req.params.id);
-  const deletedJob = await deleteJob(jobId);
-  return res.send('Delete job');
+  const {
+    params: { id: jobId },
+    user: { id },
+  } = req;
+  try {
+    await deleteJob(Number(jobId), id);
+    return res.status(StatusCodes.OK).json('Successfully deleted job');
+  } catch (error) {
+    console.log(error);
+    throw new ForbiddenError('Can not delete job with id: ' + jobId);
+  }
 }
 
 module.exports = {
